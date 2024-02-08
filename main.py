@@ -64,4 +64,13 @@ def ler_xml_servico(NF):
     }
     return dic_respostas
 
+def planilhar(Nota):
+    if 'DANFE' in Nota:
+        resposta = ler_xml_DANFE(Nota)
+        print('Nota DANFE')
+    else:
+        resposta = ler_xml_servico(Nota)
+    
+    tabela = pd.DataFrame.from_dict(resposta)
+    tabela.to_excel('NF.xlsm')
 
