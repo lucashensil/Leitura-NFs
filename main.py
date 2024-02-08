@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def ler_xml_DANFE(NF):
-    with open('Notas Fiscais\DANFEBrota.xml', 'rb') as arquivo:
+    with open(f'Notas Fiscais\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
     dic_nfe = documento['nfeProc']['NFe']['infNFe']
@@ -33,4 +33,7 @@ def ler_xml_DANFE(NF):
         'nome_vendedor': [inf_nome_comprador],
         'produtos': [lista_produtos]
     }
+
+    return dic_respostas
+
 
