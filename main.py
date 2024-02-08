@@ -35,5 +35,33 @@ def ler_xml_DANFE(NF):
     }
 
     return dic_respostas
+def ler_xml_servico(NF):
+    with open(f'Notas Fiscais\{NF}', 'rb') as arquivo:
+        documento = xmltodict.parse(arquivo)
+
+    dic_nfe = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
+
+    inf_valor = dic_nfe['Servico']['Valores']['ValorServicos']
+    inf_servicos = dic_nfe['Servico']['Discriminacao']
+
+    inf_cnpj_vendedor = dic_nfe['PrestadorServico']['IdentificacaoPrestador']['Cnpj']
+    inf_nome_vendedor = dic_nfe['PrestadorServico']['NomeFantasia']
+
+    try:
+        inf_cpfCnpj_comprador = dic_nfe['TomadorServico']['IdentificacaoTomador']['CpfCnpj']['Cnpj']
+    except:
+        inf_cpfCnpj_comprador = dic_nfe['TomadorServico']['IdentificacaoTomador']['CpfCnpj']['Cpf']
+    inf_nome_comprador = dic_nfe['TomadorServico']['RazaoSocial']
+
+
+    dic_respostas = {
+        'valor_total': [inf_valor],
+        'cnpj_vendedor': [inf_cnpj_vendedor],
+        'nome_vendedor': [inf_nome_vendedor],
+        'CpfCnpj_comprador': [inf_cpfCnpj_comprador],
+        'nome_comprador': [inf_nome_comprador],
+        'servicos': [inf_servicos]
+    }
+    return dic_respostas
 
 
