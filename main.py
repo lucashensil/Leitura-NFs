@@ -18,6 +18,7 @@ def ler_xml_DANFE(NF):
 
     dic_nfe = documento['nfeProc']['NFe']['infNFe']
     dic_produtos = dic_nfe['det']
+    dic_dest = dic_nfe['dest']
 
     lista_produtos = []
     for produto in dic_produtos:
@@ -31,24 +32,29 @@ def ler_xml_DANFE(NF):
     inf_cnpj_vendedor = dic_nfe['emit']['CNPJ']
     inf_nome_vendedor = dic_nfe['emit']['xNome']
 
-    inf_cpf_comprador = dic_nfe['dest']['CPF']
-    inf_nome_comprador = dic_nfe['dest']['xNome']
-    inf_rua = dic_nfe['dest']['enderDest']['xLgr']
-    inf_bairro = dic_nfe['dest']['enderDest']['xBairro']
+    inf_cpf_comprador = dic_dest['CPF']
+    inf_nome_comprador = dic_dest['xNome']
+    inf_rua = dic_dest['enderDest']['xLgr']
+    inf_bairro = dic_dest['enderDest']['xBairro']
     info_endereco = inf_rua + ', ' + inf_bairro
-    info_municipio = dic_nfe['dest']['enderDest']['xMun']
-    info_uf = dic_nfe['dest']['enderDest']['UF']
+    info_municipio = dic_dest['enderDest']['xMun']
+    info_uf = dic_dest['enderDest']['UF']
+    info_fone = dic_dest['enderDest']['fone']
+    info_email = dic_dest['email']
 
 
     dic_respostas = {
         'valor_total': [inf_valor],
         'cnpj_vendedor': [inf_cnpj_vendedor],
         'nome_vendedor': [inf_nome_vendedor],
+
         'endereo_comprador': [info_endereco],
         'municipio_comprador': [info_municipio],
         'estado_comprador': [info_uf],
         'cpf_comprador': [inf_cpf_comprador],
-        'nome_vendedor': [inf_nome_comprador],
+        'nome_comprador': [inf_nome_comprador],
+        'fone_comprador': [info_fone],
+        'email_comprador': [info_email],
         'produtos': [lista_produtos]
     }
 
