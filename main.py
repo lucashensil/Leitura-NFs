@@ -3,6 +3,16 @@ import pandas as pd
 
 
 def ler_xml_DANFE(NF):
+    """Funcao de leitura de DANFE
+
+    Esta funcao realiza leitura de uma nota fiscal modelo DANFE
+
+    Args:
+        NF (string): Nome do arquivo 
+
+    Returns:
+        dict: dicionario contendo todos as informacoes retiradas
+    """
     with open(f'Notas Fiscais\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
@@ -36,6 +46,14 @@ def ler_xml_DANFE(NF):
 
     return dic_respostas
 def ler_xml_servico(NF):
+    """Funcao para ler notas de servico
+
+    Args:
+        NF (string): Nome do arquivo 
+
+    Returns:
+        dict: dicionario contendo todos as informacoes retiradas
+    """
     with open(f'Notas Fiscais\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
@@ -64,12 +82,12 @@ def ler_xml_servico(NF):
     }
     return dic_respostas
 
-def planilhar(Nota):
-    if 'DANFE' in Nota:
-        resposta = ler_xml_DANFE(Nota)
-        print('Nota DANFE')
+def planilhar(NF):
+    if 'DANFE' in NF:
+        resposta = ler_xml_DANFE(NF)
+        print('NF DANFE')
     else:
-        resposta = ler_xml_servico(Nota)
+        resposta = ler_xml_servico(NF)
     
     tabela = pd.DataFrame.from_dict(resposta)
     tabela.to_excel('NF.xlsm')
