@@ -20,6 +20,7 @@ def ler_xml_DANFE(NF):
     dic_produtos = dic_nfe['det']
     dic_dest = dic_nfe['dest']
     dic_emit = dic_nfe['emit']
+    dic_transportador = dic_nfe['transp']['transporta']
     dic_valor = dic_nfe['total']['ICMSTot']
 
     lista_produtos = []
@@ -43,6 +44,12 @@ def ler_xml_DANFE(NF):
     info_municipio_vend = dic_emit['enderEmit']['xMun']
     info_uf_vend = dic_emit['enderEmit']['UF']
     info_fone_vend = dic_emit['enderEmit']['fone']
+
+    info_cnpj_transp = dic_transportador['CNPJ']
+    info_nome_transp = dic_transportador['xNome']
+    info_endereco_transp = dic_transportador['xEnder']
+    info_municipio_transp = dic_transportador['xMun']
+    info_uf_transp = dic_transportador['UF']
 
     info_cpf_comprador = dic_dest['CPF']
     info_nome_comprador = dic_dest['xNome']
@@ -69,6 +76,12 @@ def ler_xml_DANFE(NF):
         'estado_vendedor': [info_uf_vend],
         'fone_comprador': [info_fone_vend],
 
+        'cnpj_transportador': [info_cnpj_transp],
+        'nome_transportador': [info_nome_transp],
+        'endereco_transportador': [info_endereco_transp],
+        'municipio_transportador': [info_municipio_transp],
+        'estado_transportador': [info_uf_transp],
+
         'endereo_comprador': [info_endereco_compr],
         'municipio_comprador': [info_municipio_compr],
         'estado_comprador': [info_uf_compr],
@@ -76,7 +89,7 @@ def ler_xml_DANFE(NF):
         'nome_comprador': [info_nome_comprador],
         'fone_comprador': [info_fone_compr],
         'email_comprador': [info_email_compr],
-        
+
         'produtos': [lista_produtos]
     }
 
@@ -128,6 +141,3 @@ def planilhar(NF):
     tabela = pd.DataFrame.from_dict(resposta)
     tabela.to_excel('NF.xlsm')
 
-a = ler_xml_DANFE('DANFEBrota.xml')
-for x in a:
-    print(a[x])
