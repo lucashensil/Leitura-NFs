@@ -30,6 +30,9 @@ def ler_xml_DANFE(NF):
         lista_produtos.append((nome_produto, valor_produto))
 
 
+    info_natureza = dic_nfe['ide']['natOp']
+    info_emissao_data = dic_nfe['ide']['dhEmi']
+    info_data_vencimento = dic_nfe['cobr']['dup']['dVenc']
     info_valor_nota = dic_valor['vNF']
     info_valor_prod = dic_valor['vProd']
     info_valor_frete = dic_valor['vFrete']
@@ -63,7 +66,10 @@ def ler_xml_DANFE(NF):
 
 
     dic_respostas = {
-        'valor_total_prod': [info_valor_prod],
+        'natureza_operacao': [info_natureza],
+        'data_emissao': [info_emissao_data],
+        'data_vencimento': [info_data_vencimento],
+        'valor_total_prod': info_valor_prod,
         'valor_total_nota': [info_valor_nota],
         'valor_desconto': [info_valor_desc],
         'valor_frete': [info_valor_frete],
