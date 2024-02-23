@@ -33,12 +33,20 @@ def ler_xml_DANFE(NF):
 
     inf_cpf_comprador = dic_nfe['dest']['CPF']
     inf_nome_comprador = dic_nfe['dest']['xNome']
+    inf_rua = dic_nfe['dest']['enderDest']['xLgr']
+    inf_bairro = dic_nfe['dest']['enderDest']['xBairro']
+    info_endereco = inf_rua + ', ' + inf_bairro
+    info_municipio = dic_nfe['dest']['enderDest']['xMun']
+    info_uf = dic_nfe['dest']['enderDest']['UF']
 
 
     dic_respostas = {
         'valor_total': [inf_valor],
         'cnpj_vendedor': [inf_cnpj_vendedor],
         'nome_vendedor': [inf_nome_vendedor],
+        'endereo_comprador': [info_endereco],
+        'municipio_comprador': [info_municipio],
+        'estado_comprador': [info_uf],
         'cpf_comprador': [inf_cpf_comprador],
         'nome_vendedor': [inf_nome_comprador],
         'produtos': [lista_produtos]
