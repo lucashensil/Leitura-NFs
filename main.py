@@ -19,6 +19,7 @@ def ler_xml_DANFE(NF):
     dic_nfe = documento['nfeProc']['NFe']['infNFe']
     dic_produtos = dic_nfe['det']
     dic_dest = dic_nfe['dest']
+    dic_valor = dic_nfe['total']['ICMSTot']
 
     lista_produtos = []
     for produto in dic_produtos:
@@ -27,7 +28,11 @@ def ler_xml_DANFE(NF):
         lista_produtos.append((nome_produto, valor_produto))
 
 
-    inf_valor = dic_nfe['total']['ICMSTot']['vNF']
+    inf_valor_nota = dic_valor['vNF']
+    info_valor_prod = dic_valor['vProd']
+    info_valor_frete = dic_valor['vFrete']
+    info_valor_desc = dic_valor['vDesc']
+    info_valor_totTrib = dic_valor['vTotTrib']
 
     inf_cnpj_vendedor = dic_nfe['emit']['CNPJ']
     inf_nome_vendedor = dic_nfe['emit']['xNome']
@@ -44,7 +49,12 @@ def ler_xml_DANFE(NF):
 
 
     dic_respostas = {
-        'valor_total': [inf_valor],
+        'valor_total_prod': [info_valor_prod],
+        'valor_total_nota': [inf_valor_nota],
+        'valor_desconto': [info_valor_desc],
+        'valor_frete': [info_valor_frete],
+        'valor_total_tributos': [info_valor_totTrib],
+        
         'cnpj_vendedor': [inf_cnpj_vendedor],
         'nome_vendedor': [inf_nome_vendedor],
 
@@ -106,3 +116,6 @@ def planilhar(NF):
     tabela = pd.DataFrame.from_dict(resposta)
     tabela.to_excel('NF.xlsm')
 
+a = ler_xml_DANFE('DANFEBrota.xml')
+for x in a:
+    print(a[x])
