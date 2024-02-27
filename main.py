@@ -114,6 +114,10 @@ def ler_xml_servico(NF):
 
     dic_nfe = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
 
+    info_numero = dic_nfe['Numero']
+    info_codigo_verificacao = dic_nfe['CodigoVerificacao']
+    info_data_emissao = dic_nfe['DataEmissao']
+
     info_valor = dic_nfe['Servico']['Valores']['ValorServicos']
     info_servicos = dic_nfe['Servico']['Discriminacao']
 
@@ -128,6 +132,9 @@ def ler_xml_servico(NF):
 
 
     dic_respostas = {
+        'numero_nota': [info_numero],
+        'codigo_verificacao': [info_codigo_verificacao],
+        'data_emissao': [info_data_emissao],
         'valor_total': [info_valor],
         'cnpj_vendedor': [info_cnpj_vendedor],
         'nome_vendedor': [info_nome_vendedor],
