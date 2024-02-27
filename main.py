@@ -113,6 +113,7 @@ def ler_xml_servico(NF):
         documento = xmltodict.parse(arquivo)
 
     dic_nfe = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
+    dic_prestador = dic_nfe['PrestadorServico']
 
     info_numero = dic_nfe['Numero']
     info_codigo_verificacao = dic_nfe['CodigoVerificacao']
@@ -122,12 +123,16 @@ def ler_xml_servico(NF):
     info_valor = dic_nfe['Servico']['Valores']['ValorServicos']
     info_servicos = dic_nfe['Servico']['Discriminacao']
 
-    info_cnpj_vendedor = dic_nfe['PrestadorServico']['IdentificacaoPrestador']['Cnpj']
-    info_inscricao_municipal = dic_nfe['PrestadorServico']['IdentificacaoPrestador']['InscricaoMunicipal']
-    info_nome_vendedor = dic_nfe['PrestadorServico']['NomeFantasia']
-    
+    info_cnpj_vendedor = dic_prestador['IdentificacaoPrestador']['Cnpj']
+    info_inscricao_municipal = dic_prestador['IdentificacaoPrestador']['InscricaoMunicipal']
+    info_nome_vendedor = dic_prestador['NomeFantasia']
+    info_razao_social = dic_prestador['RazaoSocial']
+    info_endereco_vendedor = dic_prestador['Endereco']['Endereco'] + ' - ' + dic_prestador['Endereco']['Bairro'] + ', ' + dic_prestador['Endereco']['UF']
+    info_cep_vendedor = dic_prestador['Endereco']['CEP']    
+    info_tel_vendedor = dic_prestador['Contato']['Telefone']
+    info_email_vendedor = dic_prestador['Contato']['Email']
 
-    info_cod_municipio = dic_nfe['Servico']['CodigoMunicipio']
+    info_cod_municipio = dic_prestador['Endereco']['CodigoMunicipio']
 
 
     try:
