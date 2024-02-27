@@ -118,11 +118,17 @@ def ler_xml_servico(NF):
     info_codigo_verificacao = dic_nfe['CodigoVerificacao']
     info_data_emissao = dic_nfe['DataEmissao']
 
+
     info_valor = dic_nfe['Servico']['Valores']['ValorServicos']
     info_servicos = dic_nfe['Servico']['Discriminacao']
 
     info_cnpj_vendedor = dic_nfe['PrestadorServico']['IdentificacaoPrestador']['Cnpj']
+    info_inscricao_municipal = dic_nfe['PrestadorServico']['IdentificacaoPrestador']['InscricaoMunicipal']
     info_nome_vendedor = dic_nfe['PrestadorServico']['NomeFantasia']
+    
+
+    info_cod_municipio = dic_nfe['Servico']['CodigoMunicipio']
+
 
     try:
         info_cpfCnpj_comprador = dic_nfe['TomadorServico']['IdentificacaoTomador']['CpfCnpj']['Cnpj']
@@ -134,9 +140,11 @@ def ler_xml_servico(NF):
     dic_respostas = {
         'numero_nota': [info_numero],
         'codigo_verificacao': [info_codigo_verificacao],
+        'codigo_municipal': [info_cod_municipio],
         'data_emissao': [info_data_emissao],
         'valor_total': [info_valor],
         'cnpj_vendedor': [info_cnpj_vendedor],
+        "inscricao_municiapl": [info_inscricao_municipal],
         'nome_vendedor': [info_nome_vendedor],
         'CpfCnpj_comprador': [info_cpfCnpj_comprador],
         'nome_comprador': [info_nome_comprador],
