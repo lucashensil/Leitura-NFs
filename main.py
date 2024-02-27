@@ -114,6 +114,7 @@ def ler_xml_servico(NF):
 
     dic_nfe = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
     dic_prestador = dic_nfe['PrestadorServico']
+    dic_tomador = dic_nfe['TomadorServico']
 
     info_numero = dic_nfe['Numero']
     info_codigo_verificacao = dic_nfe['CodigoVerificacao']
@@ -136,10 +137,14 @@ def ler_xml_servico(NF):
 
 
     try:
-        info_cpfCnpj_comprador = dic_nfe['TomadorServico']['IdentificacaoTomador']['CpfCnpj']['Cnpj']
+        info_cpfCnpj_comprador = dic_tomador['IdentificacaoTomador']['CpfCnpj']['Cnpj']
     except:
-        info_cpfCnpj_comprador = dic_nfe['TomadorServico']['IdentificacaoTomador']['CpfCnpj']['Cpf']
-    info_nome_comprador = dic_nfe['TomadorServico']['RazaoSocial']
+        info_cpfCnpj_comprador = dic_tomador['IdentificacaoTomador']['CpfCnpj']['Cpf']
+    info_nome_comprador = dic_tomador['RazaoSocial']
+    info_endereco_tomador = dic_tomador['Endereco']['Endereco'] + ' - ' + dic_tomador['Endereco']['Bairro'] + ', ' + dic_tomador['Endereco']['UF']
+    info_cep_tomador = dic_tomador['Contato']['Telefone']
+    info_tel_tomador = dic_tomador['Contato']['Telefone']
+    info_email_tomador = dic_tomador['Contato']['Email']
 
 
     dic_respostas = {
@@ -160,7 +165,11 @@ def ler_xml_servico(NF):
 
         'CpfCnpj_comprador': [info_cpfCnpj_comprador],
         'nome_comprador': [info_nome_comprador],
-        'servicos': [info_servicos]
+        'servicos': [info_servicos],
+        'endereco_tomador': [info_endereco_tomador],
+        'cep_tomador': [info_cep_tomador],
+        'tel_tomador': [info_tel_tomador],
+        'email_tomador': [info_email_tomador]
     }
     return dic_respostas
 
