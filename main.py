@@ -148,9 +148,16 @@ def ler_xml_servico(NF):
         'codigo_municipal': [info_cod_municipio],
         'data_emissao': [info_data_emissao],
         'valor_total': [info_valor],
+
         'cnpj_vendedor': [info_cnpj_vendedor],
         "inscricao_municiapl": [info_inscricao_municipal],
         'nome_vendedor': [info_nome_vendedor],
+        'razao_social_vendedor': [info_razao_social],
+        'endereco_vendedor': [info_endereco_vendedor],
+        'cep_vendedor': [info_cep_vendedor],
+        'tel_vendedor': [info_tel_vendedor],
+        'email_vendedor': [info_email_vendedor],
+
         'CpfCnpj_comprador': [info_cpfCnpj_comprador],
         'nome_comprador': [info_nome_comprador],
         'servicos': [info_servicos]
