@@ -2,6 +2,17 @@ import xmltodict
 import pandas as pd
 
 
+def identificar_nf(NF):
+    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
+        documento = xmltodict.parse(arquivo)
+    
+    if 'nfeProc' in documento:
+        return 'DANFE'
+    elif 'ConsultarNfseResposta' in documento:
+        return 'Xml Servico'
+    else:
+        return 'Modelo de NF não suportado'
+
 def ler_xml_DANFE(NF):
     """Funcao de leitura de DANFE
 
@@ -13,7 +24,7 @@ def ler_xml_DANFE(NF):
     Returns:
         dict: dicionario contendo todos as informacoes retiradas
     """
-    with open(f'Notas Fiscais\{NF}', 'rb') as arquivo:
+    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
     dic_nfe = documento['nfeProc']['NFe']['infNFe']
@@ -182,4 +193,6 @@ def planilhar(NF):
     
     tabela = pd.DataFrame.from_dict(resposta)
     tabela.to_excel('NF.xlsm')
+    
+
 
