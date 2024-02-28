@@ -2,10 +2,10 @@ import xmltodict
 import pandas as pd
 import os
 
-def ler_xml_DANFE(NF):
-    """Funcao de leitura de DANFE
+def ler_xml_NFe(NF):
+    """Funcao de leitura de NFe
 
-    Esta funcao realiza leitura de uma nota fiscal modelo DANFE
+    Esta funcao realiza leitura de uma nota fiscal modelo NFe
 
     Args:
         NF (string): Nome do arquivo 
@@ -178,28 +178,56 @@ def identificar_nf(NF):
         documento = xmltodict.parse(arquivo)
     
     if 'nfeProc' in documento:
-        return 'DANFE'
+        return 'NFe'
     elif 'ConsultarNfseResposta' in documento:
         return 'Xml Servico'
     else:
         return 'Modelo de NF não suportado'   
-def planilhar_unico(NF):
-    modelo = identificar_nf(NF)
-    
-    if modelo == 'DANFE':
-        resposta = ler_xml_DANFE(NF)
-    elif modelo == 'Xml Servico':
-        resposta = ler_xml_servico(NF)
+def planilhar_arquivo(*NF, planilha='separada'):
+    notas = list(NF)
+    dfs = []
 
-    
-    tabela = pd.DataFrame.from_dict(resposta)
-    tabela.to_excel(f'NF_{NF}.xlsm')
-def planilhar_todos():
+    if planilha == 'separada':
+        for nota in notas:
+            modelo = identificar_nf(nota)
+            
+            if modelo == 'NFe':
+                resposta = ler_xml_NFe(nota)
+            elif modelo == 'Xml Servico':
+                resposta = ler_xml_servico(nota)
+
+
+            tabela = pd.DataFrame.from_dict(resposta)
+            tabela.to_excel(f'NF_{nota}.xlsm')
+
+    elif planilha == 'unica':
+        for nota in notas:
+            modelo = identificar_nf(nota)
+            
+            if modelo == 'NFe':
+                resposta = ler_xml_NFe(nota)
+                resposta_limpa = {chave: valor if valor else None for chave, valor in resposta.items()}
+                df = pd.DataFrame(resposta_limpa)
+                dfs.append(df)
+
+                tabela = pd.concat(dfs, ignore_index=True)
+                tabela.to_excel('NFs.xlsm')
+            if modelo == 'Xml Servico':
+                resposta = ler_xml_servico(nota)
+                resposta_limpa = {chave: valor if valor else None for chave, valor in resposta.items()}
+                df = pd.DataFrame(resposta_limpa)
+                dfs.append(df)
+
+                tabela = pd.concat(dfs, ignore_index=True)
+                tabela.to_excel('NFs.xlsm')
+
+
+def planilhar_pasta():
     notas = os.listdir('NFs Exemplo')
     
     for nota in notas:
         if '.xml' in nota:
-            planilhar_unico(nota)
+            planilhar_arquivo(nota)
 
 
 
