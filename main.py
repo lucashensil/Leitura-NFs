@@ -1,17 +1,6 @@
 import xmltodict
 import pandas as pd
-
-
-def identificar_nf(NF):
-    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
-        documento = xmltodict.parse(arquivo)
-    
-    if 'nfeProc' in documento:
-        return 'DANFE'
-    elif 'ConsultarNfseResposta' in documento:
-        return 'Xml Servico'
-    else:
-        return 'Modelo de NF não suportado'
+import os
 
 def ler_xml_DANFE(NF):
     """Funcao de leitura de DANFE
@@ -120,7 +109,7 @@ def ler_xml_servico(NF):
     Returns:
         dict: dicionario contendo todos as informacoes retiradas
     """
-    with open(f'Notas Fiscais\{NF}', 'rb') as arquivo:
+    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
     dic_nfe = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
@@ -139,8 +128,8 @@ def ler_xml_servico(NF):
     info_inscricao_municipal = dic_prestador['IdentificacaoPrestador']['InscricaoMunicipal']
     info_nome_vendedor = dic_prestador['NomeFantasia']
     info_razao_social = dic_prestador['RazaoSocial']
-    info_endereco_vendedor = dic_prestador['Endereco']['Endereco'] + ' - ' + dic_prestador['Endereco']['Bairro'] + ', ' + dic_prestador['Endereco']['UF']
-    info_cep_vendedor = dic_prestador['Endereco']['CEP']    
+    info_endereco_vendedor = dic_prestador['Endereco']['Endereco'] + ' - ' + dic_prestador['Endereco']['Bairro'] + ', ' + dic_prestador['Endereco']['Uf']
+    info_cep_vendedor = dic_prestador['Endereco']['Cep']    
     info_tel_vendedor = dic_prestador['Contato']['Telefone']
     info_email_vendedor = dic_prestador['Contato']['Email']
 
@@ -152,7 +141,7 @@ def ler_xml_servico(NF):
     except:
         info_cpfCnpj_comprador = dic_tomador['IdentificacaoTomador']['CpfCnpj']['Cpf']
     info_nome_comprador = dic_tomador['RazaoSocial']
-    info_endereco_tomador = dic_tomador['Endereco']['Endereco'] + ' - ' + dic_tomador['Endereco']['Bairro'] + ', ' + dic_tomador['Endereco']['UF']
+    info_endereco_tomador = dic_tomador['Endereco']['Endereco'] + ' - ' + dic_tomador['Endereco']['Bairro'] + ', ' + dic_tomador['Endereco']['Uf']
     info_cep_tomador = dic_tomador['Contato']['Telefone']
     info_tel_tomador = dic_tomador['Contato']['Telefone']
     info_email_tomador = dic_tomador['Contato']['Email']
@@ -184,15 +173,33 @@ def ler_xml_servico(NF):
     }
     return dic_respostas
 
-def planilhar(NF):
-    if 'DANFE' in NF:
-        resposta = ler_xml_DANFE(NF)
-        print('NF DANFE')
+def identificar_nf(NF):
+    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
+        documento = xmltodict.parse(arquivo)
+    
+    if 'nfeProc' in documento:
+        return 'DANFE'
+    elif 'ConsultarNfseResposta' in documento:
+        return 'Xml Servico'
     else:
+        return 'Modelo de NF não suportado'   
+def planilhar_unico(NF):
+    modelo = identificar_nf(NF)
+    
+    if modelo == 'DANFE':
+        resposta = ler_xml_DANFE(NF)
+    elif modelo == 'Xml Servico':
         resposta = ler_xml_servico(NF)
+
     
     tabela = pd.DataFrame.from_dict(resposta)
-    tabela.to_excel('NF.xlsm')
+    tabela.to_excel(f'NF_{NF}.xlsm')
+def planilhar_todos():
+    notas = os.listdir('NFs Exemplo')
     
+    for nota in notas:
+        if '.xml' in nota:
+            planilhar_unico(nota)
+
 
 
