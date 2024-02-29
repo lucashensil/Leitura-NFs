@@ -14,4 +14,6 @@ Este é um projeto de leitor de notas fiscais desenvolvido para facilitar a extr
    
 2. **Dependências**: Certifique-se de ter as dependências necessárias instaladas. Utilize o arquivo `requirements.txt` para instalar as dependências via pip, se necessário.
 
+3. **Inserir Notas Fiscais**: Adicione suas notas fiscais na pasta `Notas Fiscais`. Se desejar utilizar outro diretório, altere o argumento `caminho` nas funções apropriadas.
+
 
