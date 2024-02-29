@@ -16,6 +16,7 @@ def ler_xml_NFe(NF):
     with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
+
     dic_nfe = documento['nfeProc']['NFe']['infNFe']
     dic_produtos = dic_nfe['det']
     dic_dest = dic_nfe['dest']
@@ -100,6 +101,7 @@ def ler_xml_NFe(NF):
     }
 
     return dic_respostas
+    
 def ler_xml_servico(NF):
     """Funcao para ler notas de servico
 
@@ -174,15 +176,17 @@ def ler_xml_servico(NF):
     return dic_respostas
 
 def identificar_nf(NF):
-    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
-        documento = xmltodict.parse(arquivo)
-    
-    if 'nfeProc' in documento:
-        return 'NFe'
-    elif 'ConsultarNfseResposta' in documento:
-        return 'Xml Servico'
-    else:
-        return 'Modelo de NF não suportado'   
+    try:
+        with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
+            documento = xmltodict.parse(arquivo)
+        
+        if 'nfeProc' in documento:
+            return 'NFe'
+        elif 'ConsultarNfseResposta' in documento:
+            return 'Xml Servico'
+    except:
+        return 'Modelo nao suportado/Erro com o arquivo'
+  
 def planilhar_arquivo(*NF, planilha='separada'):
     notas = list(NF)
     dfs = []
@@ -195,6 +199,8 @@ def planilhar_arquivo(*NF, planilha='separada'):
                 resposta = ler_xml_NFe(nota)
             elif modelo == 'Xml Servico':
                 resposta = ler_xml_servico(nota)
+            else:
+                raise ValueError('Modelo nao suportado / Erro com a nota')
 
 
             tabela = pd.DataFrame.from_dict(resposta)
@@ -212,22 +218,20 @@ def planilhar_arquivo(*NF, planilha='separada'):
 
                 tabela = pd.concat(dfs, ignore_index=True)
                 tabela.to_excel('NFs.xlsm')
-            if modelo == 'Xml Servico':
+            elif modelo == 'Xml Servico':
                 resposta = ler_xml_servico(nota)
                 resposta_limpa = {chave: valor if valor else None for chave, valor in resposta.items()}
                 df = pd.DataFrame(resposta_limpa)
                 dfs.append(df)
+            else:
+                raise ValueError('Modelo nao suportado / Erro com a nota')
 
                 tabela = pd.concat(dfs, ignore_index=True)
                 tabela.to_excel('NFs.xlsm')
-
-
 def planilhar_pasta():
     notas = os.listdir('NFs Exemplo')
     
     for nota in notas:
         if '.xml' in nota:
             planilhar_arquivo(nota)
-
-
 
