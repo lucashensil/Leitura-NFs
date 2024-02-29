@@ -176,6 +176,16 @@ def ler_xml_servico(NF):
     return dic_respostas
 
 def identificar_nf(NF):
+    """Identifica o modelo da nota fiscal
+
+    Esta funcao identifica o modelo da nota fiscal. Seu uso serve para auxiliar funcoes que necessitem do modelo.
+
+    Args:
+        NF (str): Nota fiscal
+
+    Returns:
+        atr: podendo retornar os modelos antendidos, ou uma mensagem informando que nao atende
+    """
     try:
         with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
             documento = xmltodict.parse(arquivo)
@@ -188,6 +198,19 @@ def identificar_nf(NF):
         return 'Modelo nao suportado/Erro com o arquivo'
   
 def planilhar_arquivo(*NF, planilha='separada'):
+    """Transforma informações das notas fiscais em planilhas Excel.
+
+    Esta função recebe como entrada uma ou mais notas fiscais e gera planilhas Excel com suas informações. 
+    Se desejar planilhar todos os arquivos da pasta, utilize a função planilhar_pasta().
+
+    Args:
+        *NF (str): Uma ou mais notas fiscais que deseja planilhar.
+        planilha (str, opcional): Modo de planilhamento. 'separada' gera uma planilha para cada nota, 'unica' gera uma única planilha com todas as notas. 
+                                  O padrão é 'separada'.
+
+    Raises:
+        ValueError: Erro caso o modelo não seja atendido ou haja um problema no arquivo XML da nota.
+    """
     notas = list(NF)
     dfs = []
 
@@ -229,6 +252,16 @@ def planilhar_arquivo(*NF, planilha='separada'):
                 tabela = pd.concat(dfs, ignore_index=True)
                 tabela.to_excel('NFs.xlsm')
 def planilhar_pasta():
+    """Planilha informações de todas as notas fiscais em uma pasta.
+
+    Esta função processa todas as notas fiscais em uma determinada pasta e gera planilhas Excel com suas informações.
+
+    Args:
+        caminho_pasta (str, opcional): Caminho para a pasta que contém as notas fiscais. O padrão é 'NFs Exemplo'.
+
+    Raises:
+        ValueError: Erro caso não seja possível acessar a pasta especificada.
+    """
     notas = os.listdir('NFs Exemplo')
     
     for nota in notas:
