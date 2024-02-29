@@ -2,14 +2,14 @@ import xmltodict
 import pandas as pd
 import os
 
-def ler_xml_NFe(NF, caminho='NFs Exemplo'):
+def ler_xml_NFe(NF, caminho='Notas fiscais'):
     """Realiza a leitura de uma nota fiscal eletrônica (NFe).
 
     Esta função lê o arquivo XML de uma nota fiscal no formato NFe e extrai suas informações.
 
     Args:
         NF (str): Nome do arquivo da nota fiscal no formato NFe.
-        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'NFs Exemplo'.
+        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'Notas fiscais'.
 
     Returns:
         dict: Um dicionário contendo todas as informações extraídas da nota fiscal.
@@ -103,14 +103,14 @@ def ler_xml_NFe(NF, caminho='NFs Exemplo'):
 
     return dic_respostas
     
-def ler_xml_servico(NF, caminho='NFs Exemplo'):
+def ler_xml_servico(NF, caminho='Notas fiscais'):
     """Realiza a leitura de notas fiscais de serviço.
 
     Esta função lê o arquivo XML de uma nota fiscal de serviço eletronico e extrai suas informações.
 
     Args:
         NF (str): Nome do arquivo da nota fiscal.
-        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'NFs Exemplo'.
+        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'Notas fiscais'.
 
     Returns:
         dict: Um dicionário contendo todas as informações extraídas da nota fiscal.
@@ -179,14 +179,14 @@ def ler_xml_servico(NF, caminho='NFs Exemplo'):
     }
     return dic_respostas
 
-def identificar_nf(NF, caminho='NFs Exemplo'):
+def identificar_nf(NF, caminho='Notas fiscais'):
     """Identifica o modelo da nota fiscal.
 
     Esta função identifica o modelo da nota fiscal. Seu uso serve para auxiliar funções que necessitam do modelo.
 
     Args:
         NF (str): Nome do arquivo da nota fiscal.
-        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'NFs Exemplo'.
+        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'Notas fiscais'.
 
     Returns:
         str: O modelo da nota fiscal, podendo ser 'NFe', 'Xml Servico' ou uma mensagem informando que não foi possível identificar.
@@ -202,7 +202,7 @@ def identificar_nf(NF, caminho='NFs Exemplo'):
     except:
         return 'Modelo nao suportado/Erro com o arquivo'
   
-def planilhar_arquivo(*NF, planilha='separada', caminho='NFs Exemplo'):
+def planilhar_arquivo(*NF, planilha='separada', caminho='Notas fiscais'):
     """Transforma informações das notas fiscais em planilhas Excel.
 
     Esta função recebe como entrada uma ou mais notas fiscais e gera planilhas Excel com suas informações. 
@@ -214,7 +214,7 @@ def planilhar_arquivo(*NF, planilha='separada', caminho='NFs Exemplo'):
             - 'separada': gera uma planilha para cada nota. 
             - 'unica': gera uma única planilha com todas as notas. O padrão é 'separada'.
             Obs: Para utilizar 'unica', todas as notas devem ser do mesmo modelo.
-        caminho (str, opcional): Caminho para o diretório onde os arquivos das notas fiscais estão localizados. O padrão é 'NFs Exemplo'.
+        caminho (str, opcional): Caminho para o diretório onde os arquivos das notas fiscais estão localizados. O padrão é 'Notas fiscais'.
 
     Raises:
         ValueError: Erro caso o modelo não seja atendido ou haja um problema no arquivo XML da nota.
@@ -261,13 +261,13 @@ def planilhar_arquivo(*NF, planilha='separada', caminho='NFs Exemplo'):
             else:
                 raise ValueError('Modelo nao suportado / Erro com a nota')
 
-def planilhar_pasta(caminho='NFs Exemplo'):
+def planilhar_pasta(caminho='Notas fiscais'):
     """Gera planilhas Excel com informações de todas as notas fiscais em uma pasta.
 
     Esta função processa todas as notas fiscais em uma determinada pasta e gera planilhas Excel com suas informações.
 
     Args:
-        caminho (str, opcional): Caminho para a pasta que contém as notas fiscais. O padrão é 'NFs Exemplo'.
+        caminho (str, opcional): Caminho para a pasta que contém as notas fiscais. O padrão é 'Notas fiscais'.
 
     Raises:
         ValueError: Erro caso não seja possível acessar a pasta especificada
