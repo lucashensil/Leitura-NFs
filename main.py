@@ -2,18 +2,19 @@ import xmltodict
 import pandas as pd
 import os
 
-def ler_xml_NFe(NF):
-    """Funcao de leitura de NFe
+def ler_xml_NFe(NF, caminho='NFs Exemplo'):
+    """Realiza a leitura de uma nota fiscal eletrônica (NFe).
 
-    Esta funcao realiza leitura de uma nota fiscal modelo NFe
+    Esta função lê o arquivo XML de uma nota fiscal no formato NFe e extrai suas informações.
 
     Args:
-        NF (string): Nome do arquivo 
+        NF (str): Nome do arquivo da nota fiscal no formato NFe.
+        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'NFs Exemplo'.
 
     Returns:
-        dict: dicionario contendo todos as informacoes retiradas
+        dict: Um dicionário contendo todas as informações extraídas da nota fiscal.
     """
-    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
+    with open(f'{caminho}\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
 
@@ -102,16 +103,19 @@ def ler_xml_NFe(NF):
 
     return dic_respostas
     
-def ler_xml_servico(NF):
-    """Funcao para ler notas de servico
+def ler_xml_servico(NF, caminho='NFs Exemplo'):
+    """Realiza a leitura de notas fiscais de serviço.
+
+    Esta função lê o arquivo XML de uma nota fiscal de serviço eletronico e extrai suas informações.
 
     Args:
-        NF (string): Nome do arquivo 
+        NF (str): Nome do arquivo da nota fiscal.
+        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'NFs Exemplo'.
 
     Returns:
-        dict: dicionario contendo todos as informacoes retiradas
+        dict: Um dicionário contendo todas as informações extraídas da nota fiscal.
     """
-    with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
+    with open(f'{caminho}\{NF}', 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
     dic_nfe = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
@@ -175,19 +179,20 @@ def ler_xml_servico(NF):
     }
     return dic_respostas
 
-def identificar_nf(NF):
-    """Identifica o modelo da nota fiscal
+def identificar_nf(NF, caminho='NFs Exemplo'):
+    """Identifica o modelo da nota fiscal.
 
-    Esta funcao identifica o modelo da nota fiscal. Seu uso serve para auxiliar funcoes que necessitem do modelo.
+    Esta função identifica o modelo da nota fiscal. Seu uso serve para auxiliar funções que necessitam do modelo.
 
     Args:
-        NF (str): Nota fiscal
+        NF (str): Nome do arquivo da nota fiscal.
+        caminho (str, opcional): Caminho para o diretório onde o arquivo está localizado. O padrão é 'NFs Exemplo'.
 
     Returns:
-        atr: podendo retornar os modelos antendidos, ou uma mensagem informando que nao atende
+        str: O modelo da nota fiscal, podendo ser 'NFe', 'Xml Servico' ou uma mensagem informando que não foi possível identificar.
     """
     try:
-        with open(f'NFs Exemplo\{NF}', 'rb') as arquivo:
+        with open(f'{caminho}\{NF}', 'rb') as arquivo:
             documento = xmltodict.parse(arquivo)
         
         if 'nfeProc' in documento:
@@ -197,7 +202,7 @@ def identificar_nf(NF):
     except:
         return 'Modelo nao suportado/Erro com o arquivo'
   
-def planilhar_arquivo(*NF, planilha='separada'):
+def planilhar_arquivo(*NF, planilha='separada', caminho='NFs Exemplo'):
     """Transforma informações das notas fiscais em planilhas Excel.
 
     Esta função recebe como entrada uma ou mais notas fiscais e gera planilhas Excel com suas informações. 
@@ -205,8 +210,11 @@ def planilhar_arquivo(*NF, planilha='separada'):
 
     Args:
         *NF (str): Uma ou mais notas fiscais que deseja planilhar.
-        planilha (str, opcional): Modo de planilhamento. 'separada' gera uma planilha para cada nota, 'unica' gera uma única planilha com todas as notas. 
-                                  O padrão é 'separada'.
+        planilha (str, opcional): Modo de planilhamento. 
+            - 'separada': gera uma planilha para cada nota. 
+            - 'unica': gera uma única planilha com todas as notas. O padrão é 'separada'.
+            Obs: Para utilizar 'unica', todas as notas devem ser do mesmo modelo.
+        caminho (str, opcional): Caminho para o diretório onde os arquivos das notas fiscais estão localizados. O padrão é 'NFs Exemplo'.
 
     Raises:
         ValueError: Erro caso o modelo não seja atendido ou haja um problema no arquivo XML da nota.
@@ -216,12 +224,12 @@ def planilhar_arquivo(*NF, planilha='separada'):
 
     if planilha == 'separada':
         for nota in notas:
-            modelo = identificar_nf(nota)
+            modelo = identificar_nf(nota, caminho=caminho)
             
             if modelo == 'NFe':
-                resposta = ler_xml_NFe(nota)
+                resposta = ler_xml_NFe(nota, caminho=caminho)
             elif modelo == 'Xml Servico':
-                resposta = ler_xml_servico(nota)
+                resposta = ler_xml_servico(nota, caminho=caminho)
             else:
                 raise ValueError('Modelo nao suportado / Erro com a nota')
 
@@ -231,38 +239,40 @@ def planilhar_arquivo(*NF, planilha='separada'):
 
     elif planilha == 'unica':
         for nota in notas:
-            modelo = identificar_nf(nota)
+            modelo = identificar_nf(nota, caminho=caminho)
             
             if modelo == 'NFe':
-                resposta = ler_xml_NFe(nota)
+                resposta = ler_xml_NFe(nota, caminho=caminho)
                 resposta_limpa = {chave: valor if valor else None for chave, valor in resposta.items()}
                 df = pd.DataFrame(resposta_limpa)
                 dfs.append(df)
 
                 tabela = pd.concat(dfs, ignore_index=True)
                 tabela.to_excel('NFs.xlsm')
+
             elif modelo == 'Xml Servico':
-                resposta = ler_xml_servico(nota)
+                resposta = ler_xml_servico(nota, caminho=caminho)
                 resposta_limpa = {chave: valor if valor else None for chave, valor in resposta.items()}
                 df = pd.DataFrame(resposta_limpa)
                 dfs.append(df)
+
+                tabela = pd.concat(dfs, ignore_index=True)
+                tabela.to_excel('NFs.xlsm')
             else:
                 raise ValueError('Modelo nao suportado / Erro com a nota')
 
-                tabela = pd.concat(dfs, ignore_index=True)
-                tabela.to_excel('NFs.xlsm')
-def planilhar_pasta():
-    """Planilha informações de todas as notas fiscais em uma pasta.
+def planilhar_pasta(caminho='NFs Exemplo'):
+    """Gera planilhas Excel com informações de todas as notas fiscais em uma pasta.
 
     Esta função processa todas as notas fiscais em uma determinada pasta e gera planilhas Excel com suas informações.
 
     Args:
-        caminho_pasta (str, opcional): Caminho para a pasta que contém as notas fiscais. O padrão é 'NFs Exemplo'.
+        caminho (str, opcional): Caminho para a pasta que contém as notas fiscais. O padrão é 'NFs Exemplo'.
 
     Raises:
-        ValueError: Erro caso não seja possível acessar a pasta especificada.
+        ValueError: Erro caso não seja possível acessar a pasta especificada
     """
-    notas = os.listdir('NFs Exemplo')
+    notas = os.listdir(caminho)
     
     for nota in notas:
         if '.xml' in nota:
