@@ -160,47 +160,39 @@ def planilhar_arquivo(*NF, planilha='separada', caminho='Notas fiscais'):
     Raises:
         ValueError: Erro caso o modelo não seja atendido ou haja um problema no arquivo XML da nota.
     """
+    def processar_nota(nota, modelo, caminho):
+        resposta = None
+        if modelo == 'NFe':
+            resposta = ler_xml_NFe(nota, caminho=caminho)
+        elif modelo == 'Xml Servico':
+            resposta = ler_xml_servico(nota, caminho=caminho)
+        else:
+            raise ValueError('Modelo não suportado / Erro com a nota')
+        return resposta
+
     notas = list(NF)
     dfs = []
 
-    if planilha == 'separada':
-        for nota in notas:
-            modelo = identificar_nf(nota, caminho=caminho)
-            
-            if modelo == 'NFe':
-                resposta = ler_xml_NFe(nota, caminho=caminho)
-            elif modelo == 'Xml Servico':
-                resposta = ler_xml_servico(nota, caminho=caminho)
-            else:
-                raise ValueError('Modelo nao suportado / Erro com a nota')
+    modelos = {
+        'NFe': ler_xml_NFe,
+        'Xml Servico': ler_xml_servico
+    }
 
+    for nota in notas:
+        modelo = identificar_nf(nota, caminho=caminho)
+        if modelo not in modelos:
+            raise ValueError('Modelo não suportado / Erro com a nota')
+        resposta = processar_nota(nota, modelo, caminho)
+        dic_repostas = {chave: valor if valor else None for chave, valor in resposta.items()}
+        df = pd.DataFrame(dic_repostas)
+        dfs.append(df)
 
-            tabela = pd.DataFrame.from_dict(resposta)
-            tabela.to_excel(f'NF_{nota}.xlsm')
+        if planilha == 'separada':
+            df.to_excel(f'NF_{nota}.xlsm')
 
-    elif planilha == 'unica':
-        for nota in notas:
-            modelo = identificar_nf(nota, caminho=caminho)
-            
-            if modelo == 'NFe':
-                resposta = ler_xml_NFe(nota, caminho=caminho)
-                resposta_limpa = {chave: valor if valor else None for chave, valor in resposta.items()}
-                df = pd.DataFrame(resposta_limpa)
-                dfs.append(df)
-
-                tabela = pd.concat(dfs, ignore_index=True)
-                tabela.to_excel('NFs.xlsm')
-
-            elif modelo == 'Xml Servico':
-                resposta = ler_xml_servico(nota, caminho=caminho)
-                resposta_limpa = {chave: valor if valor else None for chave, valor in resposta.items()}
-                df = pd.DataFrame(resposta_limpa)
-                dfs.append(df)
-
-                tabela = pd.concat(dfs, ignore_index=True)
-                tabela.to_excel('NFs.xlsm')
-            else:
-                raise ValueError('Modelo nao suportado / Erro com a nota')
+    if planilha == 'unica':
+        tabela = pd.concat(dfs, ignore_index=True)
+        tabela.to_excel('NFs.xlsm')
 
 def planilhar_pasta(caminho='Notas fiscais'):
     """Gera planilhas Excel com informações de todas as notas fiscais em uma pasta.
