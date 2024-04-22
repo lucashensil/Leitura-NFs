@@ -14,91 +14,49 @@ def ler_xml_NFe(NF, caminho='Notas fiscais'):
     Returns:
         dict: Um dicionário contendo todas as informações extraídas da nota fiscal.
     """
-    with open(f'{caminho}\{NF}', 'rb') as arquivo:
+    caminho_completo = os.path.join(caminho, NF)
+
+    # Carregar o arquivo XML
+    with open(caminho_completo, 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
+    # Acesso aos dados da nota
+    nfe = documento['nfeProc']['NFe']['infNFe']
+    emitente = nfe['emit']
+    destinatario = nfe['dest']
+    transporte = nfe['transp']['transporta']
+    total = nfe['total']['ICMSTot']
+    produtos = [(p['prod']['xProd'], p['prod']['vProd']) for p in nfe['det']]
 
-    dic_nfe = documento['nfeProc']['NFe']['infNFe']
-    dic_produtos = dic_nfe['det']
-    dic_dest = dic_nfe['dest']
-    dic_emit = dic_nfe['emit']
-    dic_transportador = dic_nfe['transp']['transporta']
-    dic_valor = dic_nfe['total']['ICMSTot']
-
-    lista_produtos = []
-    for produto in dic_produtos:
-        valor_produto = produto['prod']['vProd']
-        nome_produto = produto['prod']['xProd']
-        lista_produtos.append((nome_produto, valor_produto))
-
-
-    info_natureza = dic_nfe['ide']['natOp']
-    info_emissao_data = dic_nfe['ide']['dhEmi']
-    info_data_vencimento = dic_nfe['cobr']['dup']['dVenc']
-    info_valor_nota = dic_valor['vNF']
-    info_valor_prod = dic_valor['vProd']
-    info_valor_frete = dic_valor['vFrete']
-    info_valor_desc = dic_valor['vDesc']
-    info_valor_totTrib = dic_valor['vTotTrib']
-
-    info_cnpj_vendedor = dic_emit['CNPJ']
-    info_nome_vendedor = dic_emit['xNome']
-    info_rua_vend =  dic_emit['enderEmit']['xLgr']
-    info_bairro_vend = dic_emit['enderEmit']['xBairro']
-    info_endereco_vend = info_rua_vend + ', ' + info_bairro_vend
-    info_municipio_vend = dic_emit['enderEmit']['xMun']
-    info_uf_vend = dic_emit['enderEmit']['UF']
-    info_fone_vend = dic_emit['enderEmit']['fone']
-
-    info_cnpj_transp = dic_transportador['CNPJ']
-    info_nome_transp = dic_transportador['xNome']
-    info_endereco_transp = dic_transportador['xEnder']
-    info_municipio_transp = dic_transportador['xMun']
-    info_uf_transp = dic_transportador['UF']
-
-    info_cpf_comprador = dic_dest['CPF']
-    info_nome_comprador = dic_dest['xNome']
-    info_rua = dic_dest['enderDest']['xLgr']
-    info_bairro = dic_dest['enderDest']['xBairro']
-    info_endereco_compr = info_rua + ', ' + info_bairro
-    info_municipio_compr = dic_dest['enderDest']['xMun']
-    info_uf_compr = dic_dest['enderDest']['UF']
-    info_fone_compr = dic_dest['enderDest']['fone']
-    info_email_compr = dic_dest['email']
-
-
+    # dicionário contendo as respostas
     dic_respostas = {
-        'natureza_operacao': [info_natureza],
-        'data_emissao': [info_emissao_data],
-        'data_vencimento': [info_data_vencimento],
-        'valor_total_prod': info_valor_prod,
-        'valor_total_nota': [info_valor_nota],
-        'valor_desconto': [info_valor_desc],
-        'valor_frete': [info_valor_frete],
-        'valor_total_tributos': [info_valor_totTrib],
-        
-        'cnpj_vendedor': [info_cnpj_vendedor],
-        'nome_vendedor': [info_nome_vendedor],
-        'endereco_vendedor': [info_endereco_vend],
-        'municipio_vendedor': [info_municipio_vend],
-        'estado_vendedor': [info_uf_vend],
-        'fone_comprador': [info_fone_vend],
-
-        'cnpj_transportador': [info_cnpj_transp],
-        'nome_transportador': [info_nome_transp],
-        'endereco_transportador': [info_endereco_transp],
-        'municipio_transportador': [info_municipio_transp],
-        'estado_transportador': [info_uf_transp],
-
-        'endereo_comprador': [info_endereco_compr],
-        'municipio_comprador': [info_municipio_compr],
-        'estado_comprador': [info_uf_compr],
-        'cpf_comprador': [info_cpf_comprador],
-        'nome_comprador': [info_nome_comprador],
-        'fone_comprador': [info_fone_compr],
-        'email_comprador': [info_email_compr],
-
-        'produtos': [lista_produtos]
+        'natureza_operacao': nfe['ide']['natOp'],
+        'data_emissao': nfe['ide']['dhEmi'],
+        'data_vencimento': nfe['cobr']['dup']['dVenc'],
+        'valor_total_prod': total['vProd'],
+        'valor_total_nota': total['vNF'],
+        'valor_desconto': total['vDesc'],
+        'valor_frete': total['vFrete'],
+        'valor_total_tributos': total['vTotTrib'],
+        'cnpj_vendedor': emitente['CNPJ'],
+        'nome_vendedor': emitente['xNome'],
+        'endereco_vendedor': emitente['enderEmit']['xLgr'] + ', ' + emitente['enderEmit']['xBairro'],
+        'municipio_vendedor': emitente['enderEmit']['xMun'],
+        'estado_vendedor': emitente['enderEmit']['UF'],
+        'fone_vendedor': emitente['enderEmit']['fone'],
+        'cnpj_transportador': transporte['CNPJ'],
+        'nome_transportador': transporte['xNome'],
+        'endereco_transportador': transporte['xEnder'],
+        'municipio_transportador': transporte['xMun'],
+        'estado_transportador': transporte['UF'],
+        'endereco_destinatario': destinatario['enderDest']['xLgr'] + ', ' + destinatario['enderDest']['xBairro'],
+        'municipio_destinatario': destinatario['enderDest']['xMun'],
+        'estado_destinatario': destinatario['enderDest']['UF'],
+        'cpf_comprador': destinatario['CPF'],
+        'nome_comprador': destinatario['xNome'],
+        'fone_comprador': destinatario['enderDest']['fone'],
+        'email_comprador': destinatario['email'],
+        'produtos': produtos
     }
 
     return dic_respostas
