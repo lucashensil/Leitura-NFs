@@ -128,16 +128,20 @@ def identificar_nf(NF, caminho='Notas fiscais'):
     Returns:
         str: O modelo da nota fiscal, podendo ser 'NFe', 'Xml Servico' ou uma mensagem informando que não foi possível identificar.
     """
+    caminho_completo = os.path.join(caminho, NF)
+
     try:
-        with open(f'{caminho}\{NF}', 'rb') as arquivo:
+        with open(caminho_completo, 'rb') as arquivo:
             documento = xmltodict.parse(arquivo)
         
         if 'nfeProc' in documento:
             return 'NFe'
         elif 'ConsultarNfseResposta' in documento:
             return 'Xml Servico'
-    except:
-        return 'Modelo nao suportado/Erro com o arquivo'
+    except FileNotFoundError:
+        return 'Arquivo não encontrado'
+    except Exception as e:
+        return f'Erro ao processar o arquivo: {e}'
   
 def planilhar_arquivo(*NF, planilha='separada', caminho='Notas fiscais'):
     """Transforma informações das notas fiscais em planilhas Excel.
