@@ -73,68 +73,47 @@ def ler_xml_servico(NF, caminho='Notas fiscais'):
     Returns:
         dict: Um dicionário contendo todas as informações extraídas da nota fiscal.
     """
-    with open(f'{caminho}\{NF}', 'rb') as arquivo:
+    caminho_completo = os.path.join(caminho, NF)
+
+    # Abrindo o arquivo XML e parseando o documento
+    with open(caminho_completo, 'rb') as arquivo:
         documento = xmltodict.parse(arquivo)
 
-    dic_nfe = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
-    dic_prestador = dic_nfe['PrestadorServico']
-    dic_tomador = dic_nfe['TomadorServico']
+    # Acessando os dados relevantes do XML
+    nfse = documento['ConsultarNfseResposta']['ListaNfse']['CompNfse']['Nfse']['InfNfse']
+    prestador = nfse['PrestadorServico']
+    tomador = nfse['TomadorServico']
 
-    info_numero = dic_nfe['Numero']
-    info_codigo_verificacao = dic_nfe['CodigoVerificacao']
-    info_data_emissao = dic_nfe['DataEmissao']
-
-
-    info_valor = dic_nfe['Servico']['Valores']['ValorServicos']
-    info_servicos = dic_nfe['Servico']['Discriminacao']
-
-    info_cnpj_vendedor = dic_prestador['IdentificacaoPrestador']['Cnpj']
-    info_inscricao_municipal = dic_prestador['IdentificacaoPrestador']['InscricaoMunicipal']
-    info_nome_vendedor = dic_prestador['NomeFantasia']
-    info_razao_social = dic_prestador['RazaoSocial']
-    info_endereco_vendedor = dic_prestador['Endereco']['Endereco'] + ' - ' + dic_prestador['Endereco']['Bairro'] + ', ' + dic_prestador['Endereco']['Uf']
-    info_cep_vendedor = dic_prestador['Endereco']['Cep']    
-    info_tel_vendedor = dic_prestador['Contato']['Telefone']
-    info_email_vendedor = dic_prestador['Contato']['Email']
-
-    info_cod_municipio = dic_prestador['Endereco']['CodigoMunicipio']
-
-
+    # Tratando a exceção para diferentes tipos de identificação (CPF ou CNPJ) do tomador
     try:
-        info_cpfCnpj_comprador = dic_tomador['IdentificacaoTomador']['CpfCnpj']['Cnpj']
-    except:
-        info_cpfCnpj_comprador = dic_tomador['IdentificacaoTomador']['CpfCnpj']['Cpf']
-    info_nome_comprador = dic_tomador['RazaoSocial']
-    info_endereco_tomador = dic_tomador['Endereco']['Endereco'] + ' - ' + dic_tomador['Endereco']['Bairro'] + ', ' + dic_tomador['Endereco']['Uf']
-    info_cep_tomador = dic_tomador['Contato']['Telefone']
-    info_tel_tomador = dic_tomador['Contato']['Telefone']
-    info_email_tomador = dic_tomador['Contato']['Email']
+        cpf_cnpj_comprador = tomador['IdentificacaoTomador']['CpfCnpj']['Cnpj']
+    except KeyError:
+        cpf_cnpj_comprador = tomador['IdentificacaoTomador']['CpfCnpj']['Cpf']
 
-
+    # Organizando os dados de retorno em um dicionário
     dic_respostas = {
-        'numero_nota': [info_numero],
-        'codigo_verificacao': [info_codigo_verificacao],
-        'codigo_municipal': [info_cod_municipio],
-        'data_emissao': [info_data_emissao],
-        'valor_total': [info_valor],
-
-        'cnpj_vendedor': [info_cnpj_vendedor],
-        "inscricao_municiapl": [info_inscricao_municipal],
-        'nome_vendedor': [info_nome_vendedor],
-        'razao_social_vendedor': [info_razao_social],
-        'endereco_vendedor': [info_endereco_vendedor],
-        'cep_vendedor': [info_cep_vendedor],
-        'tel_vendedor': [info_tel_vendedor],
-        'email_vendedor': [info_email_vendedor],
-
-        'CpfCnpj_comprador': [info_cpfCnpj_comprador],
-        'nome_comprador': [info_nome_comprador],
-        'servicos': [info_servicos],
-        'endereco_tomador': [info_endereco_tomador],
-        'cep_tomador': [info_cep_tomador],
-        'tel_tomador': [info_tel_tomador],
-        'email_tomador': [info_email_tomador]
+        'numero_nota': nfse['Numero'],
+        'codigo_verificacao': nfse['CodigoVerificacao'],
+        'codigo_municipal': prestador['Endereco']['CodigoMunicipio'],
+        'data_emissao': nfse['DataEmissao'],
+        'valor_total': nfse['Servico']['Valores']['ValorServicos'],
+        'cnpj_vendedor': prestador['IdentificacaoPrestador']['Cnpj'],
+        'inscricao_municipal': prestador['IdentificacaoPrestador']['InscricaoMunicipal'],
+        'nome_vendedor': prestador['NomeFantasia'],
+        'razao_social_vendedor': prestador['RazaoSocial'],
+        'endereco_vendedor': prestador['Endereco']['Endereco'] + ' - ' + prestador['Endereco']['Bairro'] + ', ' + prestador['Endereco']['Uf'],
+        'cep_vendedor': prestador['Endereco']['Cep'],
+        'tel_vendedor': prestador['Contato']['Telefone'],
+        'email_vendedor': prestador['Contato']['Email'],
+        'cpf_cnpj_comprador': cpf_cnpj_comprador,
+        'nome_comprador': tomador['RazaoSocial'],
+        'servicos': nfse['Servico']['Discriminacao'],
+        'endereco_tomador': tomador['Endereco']['Endereco'] + ' - ' + tomador['Endereco']['Bairro'] + ', ' + tomador['Endereco']['Uf'],
+        'cep_tomador': tomador['Endereco']['Cep'],
+        'tel_tomador': tomador['Contato']['Telefone'],
+        'email_tomador': tomador['Contato']['Email']
     }
+
     return dic_respostas
 
 def identificar_nf(NF, caminho='Notas fiscais'):
